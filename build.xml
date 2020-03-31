@@ -24,7 +24,7 @@
 
   </path>
 
-  <target name="all" depends="clean,compile,native,jar,javadoc"
+  <target name="all" depends="clean,compile,compile-native,jar,javadoc"
    description="Clean, compile, build native, create jar, create documentation"/>
 
   <target name="clean"
@@ -46,6 +46,7 @@
   	<delete dir="${build.home}" quiet="true"/>
   	<mkdir dir="${build.home}"/>
     <antcall target="compile-discid"/>
+  	<antcall target="compile-test"/>
   </target>
 	
   <target name="compile-discid">
@@ -58,8 +59,19 @@
         <classpath refid="compile.classpath"/>
     </javac>
   </target>
+	
+	<target name="compile-test">
+	    <javac srcdir="src/test"
+	          destdir="${build.home}"
+	          debug="${compile.debug}"
+	          deprecation="${compile.deprecation}"
+	          optimize="${compile.optimize}"
+	     >
+	        <classpath refid="compile.classpath"/>
+	    </javac>
+	  </target>
 
-  <target name="native" depends="compile" description="Compile native code">
+  <target name="compile-native" depends="compile" description="Compile native code">
 
 	<exec dir="${native.home}" executable="make" os="Linux">
 	 <env key="java.home" value="${java.home}"/>
@@ -103,7 +115,7 @@
                 destdir="docs/api"
             windowtitle="BeNOW ${app.name} Documentation"
                doctitle="BeNOW ${app.name} Documentation"
-           packagenames="org.*,test.*">
+           packagenames="de.*,test.*">
       <classpath refid="compile.classpath"/>
     </javadoc> 
   </target>

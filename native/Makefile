@@ -72,6 +72,6 @@ clean:
 	
 
 test:
-	gcc -Wall -Wstrict-prototypes $(ARCH) -fpic -g -shared $(CPP_INCLUDES) test_ca_benow_jni_LinkerTest.c -o $(BUILDPATH)/liblinkertest.so  
+	gcc -Wall -Wstrict-prototypes $(ARCH) -fpic -g -shared $(CPP_INCLUDES) $(SOURCEPATH)/test_ca_benow_jni_LinkerTest.c -o $(BUILDPATH)/liblinkertest.so  
 	cd ..; java -cp build:libdiscid-java.jar -Djava.library.path=native/$(BUILDPATH) test.ca.benow.jni.LinkerTest
 
