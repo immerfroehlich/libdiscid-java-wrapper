@@ -1,0 +1,84 @@
+Java Bindings for libdiscid
+andy@benow.ca - http://benow.ca
+
+Description:
+
+ Allows for calling of libdiscid from java, providing easy access
+ to disc information, including musicbrainz and freedb disc id's for
+ further retrieval of release information.
+
+
+Requirements:
+
+ - libdiscid 0.2.2 
+   - debian/ubuntu: sudo apt-get install libdiscid0 libdiscid0-dev
+   - windows: a binary is included in native/libdiscid-0.2.2-win32bin-mingw
+   - others: http://musicbrainz.org/doc/libdiscid
+ - java 1.4+ (http://java.sun.com)
+ - apache ant  (http://ant.apache.org)
+ - gcc, make
+
+
+Compilation:
+
+	You will probably need to recompile to match your platform.  To do so:
+
+	> ant clean all
+	
+ NOTE: the os and jdk home are autodetected by the ant script, and then passed to the Makefile during native
+ compilation.  Linux, freebsd and win32 (ming) have been tested and worked once upon a time.  
+	
+ Targets of note within the ant build file include:
+
+	compile: compile java sources
+	native: compile native code
+	javadoc: compile javadoc
+	clean: clean binaries
+	jar: create a jar or the java source
+  all: do everything
+
+ An 'It works!' message should be spewed during native compilation.  This shows that there are no linking errors.
+
+
+Usage:
+
+ Usage is essentially identical to libdiscid.  See the javadocs and the included example.
+
+
+Example:
+
+ A quick disc query too is included.  Insert an audio cd and run 
+
+	> run/query.sh /dev/sr0        (or other device)
+	or 
+	> run\query.bat d:\            (or other drive letter)
+
+
+Testing:
+
+ If you are having errors running the example, you might want to validate that the build and native linking works
+ by doing the following:
+ 
+  > ant clean all
+  > run/query.sh /dev/sr0
+  or
+  > run\query.bat d:\
+  
+ It should print a message that it is working (printed from native code).  This means the native linking is working and
+ libdiscid errors probably aren't due to compilation and linking (but rather to incorrect parameters, etc).  If
+ this test does not work, take a look at the native/Makefile and try to refine the failed commands.  Fire me an email 
+ (andy@benow.ca) if still no luck.
+  
+
+Deployment:
+ 
+ For use in your apps, the dist/libdisc.jar must appear in your path.  The path to the native glue must also
+ be visible within your library path.  An example startup would be:
+ 
+ 	> java -cp lib/musicbrainz-discid.jar -Djava.library.path=/path/to/libdiscid-java/native/[os]/[arch] org.my.CDRipper /dev/sr1
+
+
+Contact:
+
+ Any questions or comments?  Contact me: andy@benow.ca
+

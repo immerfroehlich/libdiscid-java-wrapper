@@ -1,0 +1,113 @@
+<project name="libdiscid-java" default="all" basedir=".">
+  <property name="app.name"      value="libdiscid-java"/>
+  <property name="app.version"   value="1.0"/>
+  <property name="build.home"    value="build"/>
+  <property name="native.home"   value="native"/>
+  <property name="lib.home"   value="lib/java"/>
+  <property file="build.properties"/>
+
+  <!-- enable assertions -->
+  <property name="build.compiler"      value="javac1.4"/>
+
+  <property name="compile.debug"       value="true"/>
+  <property name="compile.deprecation" value="false"/>
+  <property name="compile.optimize"    value="true"/>
+  <property name="java.home"    value="/tmp"/>
+
+  <path id="compile.classpath">
+
+    <!-- Include all JAR files that will be included in /WEB-INF/lib -->
+    <!-- *** CUSTOMIZE HERE AS REQUIRED BY YOUR APPLICATION *** -->
+
+    <!-- Include all needed jars -->
+    <pathelement path="${build.home}"/>
+
+  </path>
+
+  <target name="all" depends="clean,compile,native,jar,javadoc"
+   description="Clean, compile, build native, create jar, create documentation"/>
+
+  <target name="clean"
+   description="Delete old build directories">
+    <delete dir="${build.home}" quiet="yes"/>
+    <delete quiet="yes">
+      <fileset dir="." includes="**/*~" defaultexcludes="no"/>
+    </delete>
+
+  	<!-- Delegate cleaning of native code to make file -->
+  	<exec dir="${native.home}" executable="make">
+  		<arg value="clean"/>
+  	</exec>
+    
+  </target>
+
+  <target name="compile" 
+   description="Compile Java sources">
+  	<delete dir="${build.home}" quiet="true"/>
+  	<mkdir dir="${build.home}"/>
+    <antcall target="compile-discid"/>
+  </target>
+	
+  <target name="compile-discid">
+    <javac srcdir="src/discid"
+          destdir="${build.home}"
+          debug="${compile.debug}"
+          deprecation="${compile.deprecation}"
+          optimize="${compile.optimize}"
+     >
+        <classpath refid="compile.classpath"/>
+    </javac>
+  </target>
+
+  <target name="native" depends="compile" description="Compile native code">
+
+	<exec dir="${native.home}" executable="make" os="Linux">
+	 <env key="java.home" value="${java.home}"/>
+	 <env key="os.name" value="linux"/>
+	 <env key="os.arch" value="${os.arch}"/>
+	</exec>
+
+	<exec dir="${native.home}" executable="gmake" os="FreeBSD">
+	 <env key="java.home" value="${java.home}"/>
+	 <env key="os.name" value="freebsd"/>
+	 <env key="os.arch" value="${os.arch}"/>
+	</exec>
+
+  	<!-- workswith MinGW32 -->
+	<exec dir="${native.home}" executable="mingw32-make.exe" os="Windows XP">
+	 <arg value="-f"/>
+       <arg value="Makefile.mingw"/>
+	 <env key="java.home" value="${java.home}"/>
+	 <env key="os.name" value="win32"/>
+	 <env key="os.arch" value="${os.arch}"/>
+	</exec>
+	 
+  </target>
+
+  <target name="jar" 
+   description="Create binary distribution">
+    <delete dir="${build.home}" quiet="true"/>
+    <mkdir dir="${build.home}"/>
+    <antcall target="compile-discid"/>
+    <!-- <jar jarfile="musicbrainz-discid.jar" basedir="${build.home}"/> -->
+  	<jar jarfile="libdiscid-java-wrapper.jar" basedir="${build.home}"/>
+
+  </target>
+
+  <target name="javadoc" depends="compile"
+   description="Create Javadoc API documentation">
+
+    <delete dir="docs/api"/>
+    <mkdir          dir="docs/api"/>
+    <javadoc sourcepath="src/discid"
+                destdir="docs/api"
+            windowtitle="BeNOW ${app.name} Documentation"
+               doctitle="BeNOW ${app.name} Documentation"
+           packagenames="org.*,test.*">
+      <classpath refid="compile.classpath"/>
+    </javadoc> 
+  </target>
+
+</project>
+
+

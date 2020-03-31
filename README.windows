@@ -1,0 +1,17 @@
+The windows discid-java dll can be found at
+ 
+  native/win32/x86/discid-java.dll
+
+Recompilation should not be required for use, but if required, MinGW can be used.
+
+  http://mingw.org
+
+A compiled binary of libdiscid.dll has been included, as provided by 
+a libdiscid developer.  In order to use libdiscid-java the libdiscid.dll must
+be in the path.  You might want to 
+
+  copy native\libdiscid-0.2.2-win32bin-mingw\bin\libdiscid.dll C:\windows\system32
+
+or otherwise have it on the path. (Having it in the java.libary.path does not seem 
+sufficient).
+
