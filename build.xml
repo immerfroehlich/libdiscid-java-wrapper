@@ -3,7 +3,10 @@
   <property name="app.version"   value="1.0"/>
   <property name="build.home"    value="build"/>
   <property name="native.home"   value="native"/>
-  <property name="lib.home"   value="lib/java"/>
+  <property name="build.java.classes"    value="${build.home}/classes"/>
+  <property name="build.java.jar"    value="${build.home}/libs"/>
+  <property name="build.java.docs"    value="docs"/>
+  <!-- <property name="lib.home"   value="lib/java"/> -->
   <property file="build.properties"/>
 
   <!-- enable assertions -->
@@ -20,7 +23,7 @@
     <!-- *** CUSTOMIZE HERE AS REQUIRED BY YOUR APPLICATION *** -->
 
     <!-- Include all needed jars -->
-    <pathelement path="${build.home}"/>
+    <pathelement path="${build.java.classes}"/>
 
   </path>
 
@@ -30,9 +33,7 @@
   <target name="clean"
    description="Delete old build directories">
     <delete dir="${build.home}" quiet="yes"/>
-    <delete quiet="yes">
-      <fileset dir="." includes="**/*~" defaultexcludes="no"/>
-    </delete>
+  	<delete dir="${build.java.docs}" quiet="yes"/>
 
   	<!-- Delegate cleaning of native code to make file -->
   	<exec dir="${native.home}" executable="make">
@@ -44,45 +45,43 @@
   <target name="compile" 
    description="Compile Java sources">
   	<delete dir="${build.home}" quiet="true"/>
-  	<mkdir dir="${build.home}"/>
-    <antcall target="compile-discid"/>
-  	<antcall target="compile-test"/>
+  	<mkdir dir="${build.java.classes}"/>
+  	
+  	<!-- Main discid source code -->
+  	<javac srcdir="src/discid"
+  	          destdir="${build.java.classes}"
+  	          debug="${compile.debug}"
+  	          deprecation="${compile.deprecation}"
+  	          optimize="${compile.optimize}"
+  	     >
+  	        <classpath refid="compile.classpath"/>
+  	    </javac>
+  	
+  	<!-- test source code -->
+  	<javac srcdir="src/test"
+  		          destdir="${build.java.classes}"
+  		          debug="${compile.debug}"
+  		          deprecation="${compile.deprecation}"
+  		          optimize="${compile.optimize}"
+  		     >
+  		        <classpath refid="compile.classpath"/>
+  		    </javac>
   </target>
 	
-  <target name="compile-discid">
-    <javac srcdir="src/discid"
-          destdir="${build.home}"
-          debug="${compile.debug}"
-          deprecation="${compile.deprecation}"
-          optimize="${compile.optimize}"
-     >
-        <classpath refid="compile.classpath"/>
-    </javac>
-  </target>
-	
-	<target name="compile-test">
-	    <javac srcdir="src/test"
-	          destdir="${build.home}"
-	          debug="${compile.debug}"
-	          deprecation="${compile.deprecation}"
-	          optimize="${compile.optimize}"
-	     >
-	        <classpath refid="compile.classpath"/>
-	    </javac>
-	  </target>
-
   <target name="compile-native" depends="compile" description="Compile native code">
 
 	<exec dir="${native.home}" executable="make" os="Linux">
 	 <env key="java.home" value="${java.home}"/>
 	 <env key="os.name" value="linux"/>
 	 <env key="os.arch" value="${os.arch}"/>
+	 <env key="java.classes" value="${build.java.classes}"/>
 	</exec>
 
 	<exec dir="${native.home}" executable="gmake" os="FreeBSD">
 	 <env key="java.home" value="${java.home}"/>
 	 <env key="os.name" value="freebsd"/>
 	 <env key="os.arch" value="${os.arch}"/>
+	 <env key="java.classes" value="${build.java.classes}"/>
 	</exec>
 
   	<!-- workswith MinGW32 -->
@@ -92,17 +91,14 @@
 	 <env key="java.home" value="${java.home}"/>
 	 <env key="os.name" value="win32"/>
 	 <env key="os.arch" value="${os.arch}"/>
+	 <env key="java.classes" value="${build.java.classes}"/>
 	</exec>
 	 
   </target>
 
-  <target name="jar" 
+  <target name="jar" depends="compile" 
    description="Create binary distribution">
-    <delete dir="${build.home}" quiet="true"/>
-    <mkdir dir="${build.home}"/>
-    <antcall target="compile-discid"/>
-    <!-- <jar jarfile="musicbrainz-discid.jar" basedir="${build.home}"/> -->
-  	<jar jarfile="libdiscid-java-wrapper.jar" basedir="${build.home}"/>
+  	<jar jarfile="${build.java.jar}/libdiscid-java-wrapper.jar" basedir="${build.java.classes}"/>
 
   </target>
 
@@ -113,8 +109,8 @@
     <mkdir          dir="docs/api"/>
     <javadoc sourcepath="src/discid"
                 destdir="docs/api"
-            windowtitle="BeNOW ${app.name} Documentation"
-               doctitle="BeNOW ${app.name} Documentation"
+            windowtitle="${app.name} Documentation"
+               doctitle="${app.name} Documentation"
            packagenames="de.*,test.*">
       <classpath refid="compile.classpath"/>
     </javadoc> 

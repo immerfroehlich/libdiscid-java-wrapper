@@ -6,14 +6,15 @@
 
 
 # v-- these properties are passed in by the ant build script.  should work fine with standard jvms --v
-prefix=${java.home}/..
+JAVADIR=${java.home}/..
 OSNAME=${os.name}
 ARCHNAME=${os.arch}
 LIBDISCID_PREFIX=/usr
-#
+#relative to source path
+JAVACLASSDIR=../../${java.classes}
 
 
-JAVADIR=$(prefix)
+
 CC=gcc
 CPP_INCLUDES=-I$(JAVADIR)/include -I$(JAVADIR)/include/$(OSNAME) -I${LIBDISCID_PREFIX}/include
 #RM_F=rm -f
@@ -26,7 +27,7 @@ LIBDEST=$(LIBBASENAME).so.1.0
 
 LIBS=-ldiscid
 
-JAVACLASSDIR=../../build
+#JAVACLASSDIR=../../build
 JAVAH = javah -force -classpath $(JAVACLASSDIR)
 
 #JNIOBJ=\
@@ -40,23 +41,23 @@ JAVAH = javah -force -classpath $(JAVACLASSDIR)
 JNIHEADERS:=$(JNIOBJ:.o=.h)
 
 JNICLASSES=\
-	de.immerfroehlich.discid.DiscIdCalculator \
-	test.ca.benow.jni.LinkerTest
+	de.immerfroehlich.discid.DiscIdCalculator
 	
 BUILDPATH=build/$(OSNAME)/$(ARCHNAME)
 SOURCEPATH=src
 
 #----------------- rules -------------------
 
-all: simple test
+all: simple
 
-jni:
+#jni:
   
 
 simple:
 	echo Using JAVA_HOME=$(JAVADIR)
 	$(MKDIR_P) $(BUILDPATH)
-	cd $(SOURCEPATH) && $(JAVAH) -d . $(JNICLASSES) #Each line is executed in a new shell so use && if commands needs to be executed in the same shell
+#	Each line is executed in a new shell so use && if commands needs to be executed in the same shell
+	cd $(SOURCEPATH) && $(JAVAH) -d . $(JNICLASSES)
 	$(CC) -Wall -Wstrict-prototypes -fpic -g -shared \
 	$(CPP_INCLUDES) \
 	-o $(BUILDPATH)/libdiscid-java.so $(SOURCEPATH)/de_immerfroehlich_discid_DiscIdCalculator.c \
@@ -71,7 +72,7 @@ clean:
 	$(RM) -r $(BUILDPATH)
 	
 
-test:
-	gcc -Wall -Wstrict-prototypes $(ARCH) -fpic -g -shared $(CPP_INCLUDES) $(SOURCEPATH)/test_ca_benow_jni_LinkerTest.c -o $(BUILDPATH)/liblinkertest.so  
-	cd ..; java -cp build:libdiscid-java.jar -Djava.library.path=native/$(BUILDPATH) test.ca.benow.jni.LinkerTest
+#test:
+#	gcc -Wall -Wstrict-prototypes $(ARCH) -fpic -g -shared $(CPP_INCLUDES) $(SOURCEPATH)/test_ca_benow_jni_LinkerTest.c -o $(BUILDPATH)/liblinkertest.so
+#	cd ..; java -cp build:libdiscid-java.jar -Djava.library.path=native/$(BUILDPATH) test.ca.benow.jni.LinkerTest
 
