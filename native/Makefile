@@ -6,7 +6,7 @@
 
 
 # v-- these properties are passed in by the ant build script.  should work fine with standard jvms --v
-JAVADIR=${java.home}/..
+JAVADIR=${java.home}
 OSNAME=${os.name}
 ARCHNAME=${os.arch}
 LIBDISCID_PREFIX=/usr
@@ -57,7 +57,7 @@ simple:
 	echo Using JAVA_HOME=$(JAVADIR)
 	$(MKDIR_P) $(BUILDPATH)
 #	Each line is executed in a new shell so use && if commands needs to be executed in the same shell
-	cd $(SOURCEPATH) && $(JAVAH) -d . $(JNICLASSES)
+# javah not needed anymore	cd $(SOURCEPATH) && $(JAVAH) -d . $(JNICLASSES)
 	$(CC) -Wall -Wstrict-prototypes -fpic -g -shared \
 	$(CPP_INCLUDES) \
 	-o $(BUILDPATH)/libdiscid-java.so $(SOURCEPATH)/de_immerfroehlich_discid_DiscIdCalculator.c \
