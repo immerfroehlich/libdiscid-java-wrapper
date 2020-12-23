@@ -11,5 +11,6 @@ public class DiscIdCalculator {
 	//TODO make this private and handle the error that the drive/cd could not
 	//found in Java ways
 	public native String calculate(String drivePath);
-
+        
+        public native String getToc(String drivePath);
 }
